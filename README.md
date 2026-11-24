@@ -32,7 +32,3 @@ Stack: React 19, TypeScript, Vite, React Router. Font: JetBrains Mono.
 - `src/measurement_scraper.py` — optional local scraper prototype (not used by the UI by default)
 
 Optional scraper setup: `pip install -r requirements-scraper.txt` and `playwright install chromium`. Parser tests: `python -m pytest tests/test_parser.py`.
-
-## GitHub
-
-Safe to publish the **code** and **mock data** in `products.ts`. Do not commit scraped retailer databases, `measurements.db`, or `inspect_output/`.

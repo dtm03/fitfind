@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { BrandsPanel } from './panels/BrandsPanel';
-import { MeasurementsPanel } from './panels/MeasurementsPanel';
-import { ShoppingListPanel } from './panels/ShoppingListPanel';
-import { WishlistPanel } from './panels/WishlistPanel';
-import { cls } from '../lib/format';
-import { useStore } from '../store/store';
-import type { Category } from '../types';
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { MeasurementsPanel } from "./panels/MeasurementsPanel";
+import { ShoppingListPanel } from "./panels/ShoppingListPanel";
+import { WishlistPanel } from "./panels/WishlistPanel";
+import { cls } from "../lib/format";
+import { useStore } from "../store/store";
+import type { Category } from "../types";
 
-type HeaderPanel = 'wishlist' | 'list' | 'brands' | 'measurements';
+type HeaderPanel = "wishlist" | "list" | "brands" | "measurements";
 
 export function Header() {
   const { state } = useStore();
@@ -22,7 +21,8 @@ export function Header() {
   return (
     <header className="header">
       <Link to="/" className="logo" aria-label="fitfind home">
-        <span className="logo-mark">[ff]</span> fitfind<span className="cursor">_</span>
+        <span className="logo-mark">[ff]</span> fitfind
+        <span className="cursor">_</span>
       </Link>
       <nav className="nav">
         <NavLink to="/" end>
@@ -39,16 +39,14 @@ export function Header() {
           <WishlistPanel />
         </HeaderDropdown>
         <HeaderDropdown
-          label="list"
+          label="shoppinglist"
           panel="list"
           active={open}
           onToggle={setOpen}
           badge={openNeeds > 0 ? openNeeds : undefined}
+          size="sm"
         >
           <ShoppingListPanel />
-        </HeaderDropdown>
-        <HeaderDropdown label="brands" panel="brands" active={open} onToggle={setOpen}>
-          <BrandsPanel />
         </HeaderDropdown>
         <HeaderDropdown
           label="measurements"
@@ -71,7 +69,7 @@ function HeaderDropdown({
   active,
   onToggle,
   badge,
-  size = 'md',
+  size = "md",
   children,
 }: {
   label: string;
@@ -79,7 +77,7 @@ function HeaderDropdown({
   active: HeaderPanel | null;
   onToggle: (next: HeaderPanel | null) => void;
   badge?: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   children: ReactNode;
 }) {
   const open = active === panel;
@@ -88,14 +86,15 @@ function HeaderDropdown({
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onToggle(null);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        onToggle(null);
     };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onToggle(null);
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onToggle(null);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
     };
   }, [open, onToggle]);
 
@@ -103,7 +102,7 @@ function HeaderDropdown({
     <div className="header-dropdown" ref={ref}>
       <button
         type="button"
-        className={cls('nav-panel-btn', open && 'on')}
+        className={cls("nav-panel-btn", open && "on")}
         aria-expanded={open}
         onClick={() => onToggle(open ? null : panel)}
       >
@@ -113,11 +112,13 @@ function HeaderDropdown({
       {open && (
         <div
           className={cls(
-            'popover',
-            'header-popover',
-            size === 'sm' && 'header-popover-sm',
-            size === 'lg' && 'header-popover-lg',
-            panel === 'measurements' && 'header-popover-measurements',
+            "popover",
+            "header-popover",
+            size === "sm" && "header-popover-sm",
+            size === "lg" && "header-popover-lg",
+            panel === "measurements" && "header-popover-measurements",
+            panel === "list" && "header-popover-list",
+            panel === "brands" && "header-popover-brands",
           )}
         >
           {children}

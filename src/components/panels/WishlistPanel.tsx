@@ -28,28 +28,31 @@ export function WishlistPanel() {
 
         return (
           <li key={product.id} className="wishlist-panel-row">
-            <div className="wishlist-panel-main">
+            <div className="wishlist-panel-head">
               <Link to={`/product/${product.id}`} className="wishlist-panel-name">
-                <span className="muted">{product.brand.toLowerCase()}</span>
+                <span className="muted wishlist-panel-brand">
+                  {product.brand.toLowerCase()} · {formatPrice(product.price)}
+                </span>
                 <span className="wishlist-panel-title">{product.name}</span>
               </Link>
-              <div className="wishlist-panel-meta muted small">
-                {CATEGORIES[product.category].label} · {formatPrice(product.price)}
-                {size && ` · ${size}`}
+              <div className="wishlist-panel-side">
+                <FitBadge fit={fit} />
+                <button
+                  type="button"
+                  className="link-btn wishlist-panel-remove"
+                  onClick={() => dispatch({ type: 'wishlist/toggle', productId: product.id })}
+                  aria-label="remove from wishlist"
+                >
+                  remove
+                </button>
               </div>
             </div>
-            <div className="wishlist-panel-actions">
-              <FitBadge fit={fit} />
-              <RetailerBuyLink product={product} size={size} disabled={!size} className="btn-sm" />
-              <button
-                type="button"
-                className="link-btn"
-                onClick={() => dispatch({ type: 'wishlist/toggle', productId: product.id })}
-                aria-label="remove from wishlist"
-              >
-                remove
-              </button>
-            </div>
+            <RetailerBuyLink
+              product={product}
+              size={size}
+              disabled={!size}
+              className="btn-sm btn-block wishlist-panel-buy"
+            />
           </li>
         );
       })}

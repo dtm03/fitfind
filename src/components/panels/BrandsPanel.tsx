@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { CATEGORIES } from '../../data/categories';
-import { bestFit, fitLevel, type FitResult } from '../../lib/fit';
-import { useProducts } from '../../store/products';
-import { useStore } from '../../store/store';
-import type { Category, Product } from '../../types';
+import { useMemo } from "react";
+import { CATEGORIES } from "../../data/categories";
+import { bestFit, fitLevel, type FitResult } from "../../lib/fit";
+import { useProducts } from "../../store/products";
+import { useStore } from "../../store/store";
+import type { Category, Product } from "../../types";
 
 interface Scored {
   product: Product;
@@ -12,7 +12,7 @@ interface Scored {
 
 function bar(score: number): string {
   const filled = Math.round(score / 10);
-  return '█'.repeat(filled) + '░'.repeat(10 - filled);
+  return "█".repeat(filled) + "░".repeat(10 - filled);
 }
 
 export function BrandsPanel() {
@@ -30,13 +30,19 @@ export function BrandsPanel() {
 
   const brands = useMemo(() => {
     const map = new Map<string, Scored[]>();
-    for (const s of scored) map.set(s.product.brand, [...(map.get(s.product.brand) ?? []), s]);
+    for (const s of scored)
+      map.set(s.product.brand, [...(map.get(s.product.brand) ?? []), s]);
     return [...map.entries()]
       .map(([brand, items]) => {
-        const avg = Math.round(items.reduce((sum, i) => sum + i.fit.score, 0) / items.length);
+        const avg = Math.round(
+          items.reduce((sum, i) => sum + i.fit.score, 0) / items.length,
+        );
         const sizesByCategory = new Map<Category, string[]>();
         for (const i of items) {
-          sizesByCategory.set(i.product.category, [...(sizesByCategory.get(i.product.category) ?? []), i.fit.size]);
+          sizesByCategory.set(i.product.category, [
+            ...(sizesByCategory.get(i.product.category) ?? []),
+            i.fit.size,
+          ]);
         }
         const sizes = [...sizesByCategory.entries()].map(([category, list]) => {
           const counts = new Map<string, number>();
@@ -50,7 +56,11 @@ export function BrandsPanel() {
   }, [scored]);
 
   if (brands.length === 0) {
-    return <p className="muted small panel-intro">Add measurements first to see which brands fit you best.</p>;
+    return (
+      <p className="muted small panel-intro">
+        Add measurements first to see which brands fit you best.
+      </p>
+    );
   }
 
   return (
@@ -58,11 +68,11 @@ export function BrandsPanel() {
       {brands.map((b) => (
         <li key={b.brand}>
           <span className="brand-name">{b.brand.toLowerCase()}</span>
-          <span className={`bar fit-text-${fitLevel(b.avg)}`}>{bar(b.avg)}</span>
-          <span className="brand-score">{b.avg}</span>
-          <span className="muted small">
-            {b.count} items · {b.sizes.join(' · ')}
+          <span className={`bar fit-text-${fitLevel(b.avg)}`}>
+            {bar(b.avg)}
           </span>
+          <span className="brand-score">{b.avg}</span>
+          <span className="muted small">{b.count} items</span>
         </li>
       ))}
     </ul>

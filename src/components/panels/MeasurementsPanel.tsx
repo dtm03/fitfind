@@ -10,34 +10,38 @@ export function MeasurementsPanel() {
 
   return (
     <div className="measurements-popover-content">
-      <div className="panel tolerance tolerance-compact">
-        <label className="field">
-          <span>
-            tolerance: ±{profile.tolerance.toLocaleString('en-GB')} cm{' '}
-            <span className="muted">(lengths ±{(profile.tolerance * 1.5).toLocaleString('en-GB')} cm)</span>
-          </span>
-          <input
-            type="range"
-            min={0.5}
-            max={4}
-            step={0.5}
-            value={profile.tolerance}
-            onChange={(e) => dispatch({ type: 'profile/tolerance', value: Number(e.target.value) })}
-          />
-        </label>
-        {(['top', 'bottom'] as CategoryGroup[]).map((group) => (
-          <label key={group} className="field field-inline">
-            <span>usual size ({group === 'top' ? 'tops' : 'bottoms'})</span>
-            <select
-              value={profile.preferredSizes[group]}
-              onChange={(e) => dispatch({ type: 'profile/preferredSize', group, size: e.target.value })}
-            >
-              {SIZES[group].map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
+      <div className="panel tolerance-compact tolerance-popover-row">
+        <div className="tolerance-slider-col">
+          <label className="field tolerance-field">
+            <span>
+              tolerance: ±{profile.tolerance.toLocaleString('en-GB')} cm{' '}
+              <span className="muted">(lengths ±{(profile.tolerance * 1.5).toLocaleString('en-GB')} cm)</span>
+            </span>
+            <input
+              type="range"
+              min={0.5}
+              max={4}
+              step={0.5}
+              value={profile.tolerance}
+              onChange={(e) => dispatch({ type: 'profile/tolerance', value: Number(e.target.value) })}
+            />
           </label>
-        ))}
+        </div>
+        <div className="tolerance-sizes-col">
+          {(['top', 'bottom'] as CategoryGroup[]).map((group) => (
+            <label key={group} className="field field-inline field-size-pref">
+              <span>usual size ({group === 'top' ? 'tops' : 'bottoms'})</span>
+              <select
+                value={profile.preferredSizes[group]}
+                onChange={(e) => dispatch({ type: 'profile/preferredSize', group, size: e.target.value })}
+              >
+                {SIZES[group].map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="measure-cards measure-cards-compact">
