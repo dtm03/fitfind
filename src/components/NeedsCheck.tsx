@@ -15,9 +15,9 @@ export function NeedsCheck() {
   return (
     <aside className="panel">
       <div className="row-between">
-        <h3>einkaufsliste</h3>
+        <h3>shopping list</h3>
         <span className="muted small">
-          {covered}/{open.length} im warenkorb
+          {covered}/{open.length} in cart
         </span>
       </div>
       {open.length > 0 && (
@@ -25,7 +25,7 @@ export function NeedsCheck() {
           <div style={{ width: `${(covered / open.length) * 100}%` }} />
         </div>
       )}
-      {open.length === 0 && <p className="muted small">keine offenen punkte.</p>}
+      {open.length === 0 && <p className="muted small">no open items.</p>}
       <ul className="plain needs-check">
         {matches.map(({ need, match }) => (
           <li key={need.id}>
@@ -34,22 +34,22 @@ export function NeedsCheck() {
               <div>{need.note || CATEGORIES[need.category].label}</div>
               <div className="muted small">
                 {CATEGORIES[need.category].label}
-                {need.maxPrice != null && ` · bis ${need.maxPrice} €`}
+                {need.maxPrice != null && ` · up to ${need.maxPrice} €`}
                 {' · '}
                 {match.product ? (
                   <>
                     {NEED_STATUS_LABEL[match.status]}: <Link to={`/product/${match.product.id}`}>{match.product.name}</Link>
                   </>
                 ) : (
-                  <Link to={`/?cat=${need.category}`}>im shop suchen →</Link>
+                  <Link to={`/?cat=${need.category}`}>search shop →</Link>
                 )}
               </div>
             </div>
           </li>
         ))}
       </ul>
-      <Link to="/profile?tab=liste" className="small">
-        liste bearbeiten →
+      <Link to="/profile?tab=list" className="small">
+        edit list →
       </Link>
     </aside>
   );

@@ -3,8 +3,8 @@ import type { CartItem, Product, ShippingMethod } from '../types';
 export const FREE_SHIPPING_FROM = 100;
 
 export const SHIPPING: Record<ShippingMethod, { label: string; eta: string }> = {
-  standard: { label: 'standard', eta: '3–5 werktage' },
-  express: { label: 'express', eta: '1–2 werktage' },
+  standard: { label: 'standard', eta: '3–5 business days' },
+  express: { label: 'express', eta: '1–2 business days' },
 };
 
 export function shippingCost(subtotal: number, method: ShippingMethod): number {

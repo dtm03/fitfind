@@ -1,5 +1,6 @@
 import { CATEGORIES } from '../data/categories';
-import type { Category, MeasurementKey, Product, Profile, SizeVariant } from '../types';
+import { isBlend } from '../data/materials';
+import type { Category, Fiber, MeasurementKey, Product, Profile, SizeVariant } from '../types';
 import { bestFit, type FitResult } from './fit';
 
 export type SortKey = 'fit' | 'price-asc' | 'price-desc' | 'name';
@@ -20,6 +21,16 @@ export interface Filters {
   fitOnly: boolean;
   ranges: Partial<Record<MeasurementKey, Range>>;
   sort: SortKey;
+  /** Product must contain each selected fibre. */
+  fibers: Fiber[];
+  blendOnly: boolean;
+  noPolyester: boolean;
+  origins: string[];
+  fairTradeOnly: boolean;
+  organicOnly: boolean;
+  recycledOnly: boolean;
+  /** fair trade OR organic OR recycled */
+  sustainableOnly: boolean;
 }
 
 export const DEFAULT_FILTERS: Filters = {
@@ -31,6 +42,14 @@ export const DEFAULT_FILTERS: Filters = {
   fitOnly: false,
   ranges: {},
   sort: 'fit',
+  fibers: [],
+  blendOnly: false,
+  noPolyester: false,
+  origins: [],
+  fairTradeOnly: false,
+  organicOnly: false,
+  recycledOnly: false,
+  sustainableOnly: false,
 };
 
 export const FIT_ONLY_MIN_SCORE = 70;
@@ -55,6 +74,22 @@ function variantMatches(variant: SizeVariant, ranges: [MeasurementKey, Range][])
   });
 }
 
+function passesMaterial(product: Product, filters: Filters): boolean {
+  if (filters.noPolyester && product.fibers.includes('polyester')) return false;
+  if (filters.blendOnly && !isBlend(product.fibers)) return false;
+  if (filters.fibers.length && !filters.fibers.every((f) => product.fibers.includes(f))) return false;
+  return true;
+}
+
+function passesEthics(product: Product, filters: Filters): boolean {
+  const { ethics } = product;
+  if (filters.fairTradeOnly && !ethics.fairTrade) return false;
+  if (filters.organicOnly && !ethics.organic) return false;
+  if (filters.recycledOnly && !ethics.recycled) return false;
+  if (filters.sustainableOnly && !(ethics.fairTrade || ethics.organic || ethics.recycled)) return false;
+  return true;
+}
+
 export function applyFilters(products: Product[], filters: Filters, profile: Profile): Result[] {
   const q = filters.q.trim().toLowerCase();
   const ranges = activeRanges(filters);
@@ -63,14 +98,17 @@ export function applyFilters(products: Product[], filters: Filters, profile: Pro
   for (const product of products) {
     if (filters.categories.length && !filters.categories.includes(product.category)) continue;
     if (filters.brands.length && !filters.brands.includes(product.brand)) continue;
+    if (filters.origins.length && !filters.origins.includes(product.originCountry)) continue;
     if (filters.priceMin != null && product.price < filters.priceMin) continue;
     if (filters.priceMax != null && product.price > filters.priceMax) continue;
+    if (!passesMaterial(product, filters)) continue;
+    if (!passesEthics(product, filters)) continue;
     if (q) {
-      const haystack = `${product.name} ${product.brand} ${product.color} ${product.material} ${CATEGORIES[product.category].label}`.toLowerCase();
+      const haystack =
+        `${product.name} ${product.brand} ${product.color} ${product.material} ${product.originCountry} ${CATEGORIES[product.category].label}`.toLowerCase();
       if (!haystack.includes(q)) continue;
     }
 
-    // A measurement filter on a key the category doesn't have excludes the product.
     const keys = CATEGORIES[product.category].keys;
     if (ranges.some(([key]) => !keys.includes(key))) continue;
 
@@ -111,9 +149,17 @@ export function countActive(filters: Filters): number {
     filters.categories.length +
     filters.sizes.length +
     filters.brands.length +
+    filters.fibers.length +
+    filters.origins.length +
     (filters.priceMin != null ? 1 : 0) +
     (filters.priceMax != null ? 1 : 0) +
     (filters.fitOnly ? 1 : 0) +
+    (filters.blendOnly ? 1 : 0) +
+    (filters.noPolyester ? 1 : 0) +
+    (filters.fairTradeOnly ? 1 : 0) +
+    (filters.organicOnly ? 1 : 0) +
+    (filters.recycledOnly ? 1 : 0) +
+    (filters.sustainableOnly ? 1 : 0) +
     (filters.q.trim() ? 1 : 0) +
     activeRanges(filters).length
   );

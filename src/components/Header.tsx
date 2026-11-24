@@ -12,15 +12,15 @@ export function Header() {
 
   return (
     <header className="header">
-      <Link to="/" className="logo" aria-label="fitfind startseite">
+      <Link to="/" className="logo" aria-label="fitfind home">
         <span className="logo-mark">[ff]</span> fitfind<span className="cursor">_</span>
       </Link>
       <nav className="nav">
         <NavLink to="/" end>
           shop
         </NavLink>
-        <NavLink to="/wishlist">merkliste{state.wishlist.length > 0 && <sup>{state.wishlist.length}</sup>}</NavLink>
-        <NavLink to="/cart">warenkorb{cartCount > 0 && <sup>{cartCount}</sup>}</NavLink>
+        <NavLink to="/wishlist">wishlist{state.wishlist.length > 0 && <sup>{state.wishlist.length}</sup>}</NavLink>
+        <NavLink to="/cart">cart{cartCount > 0 && <sup>{cartCount}</sup>}</NavLink>
         <ProfileMenu />
       </nav>
     </header>
@@ -61,18 +61,18 @@ function ProfileMenu() {
     <div className="profile-menu" ref={ref}>
       <button className="profile-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="avatar">{state.profile.name.charAt(0) || '?'}</span>
-        profil{openNeeds.length > 0 && <sup>{openNeeds.length}</sup>}
+        profile{openNeeds.length > 0 && <sup>{openNeeds.length}</sup>}
       </button>
       {open && (
         <div className="popover">
           <div className="popover-head">
             <strong>{state.profile.name}</strong>
-            <Link to="/profile">bearbeiten →</Link>
+            <Link to="/profile">edit →</Link>
           </div>
 
           <div className="popover-section">
-            <div className="label">einkaufsliste</div>
-            {openNeeds.length === 0 && <p className="muted small">nichts offen.</p>}
+            <div className="label">shopping list</div>
+            {openNeeds.length === 0 && <p className="muted small">nothing open.</p>}
             <ul className="plain">
               {openNeeds.slice(0, 5).map((need) => {
                 const match = matchNeed(need, state.cart, state.wishlist, byId);
@@ -85,18 +85,18 @@ function ProfileMenu() {
                 );
               })}
             </ul>
-            <Link to="/profile?tab=liste" className="small">
-              liste öffnen →
+            <Link to="/profile?tab=list" className="small">
+              open list →
             </Link>
           </div>
 
           <div className="popover-section">
-            <div className="label">maße hinterlegt</div>
+            <div className="label">saved measurements</div>
             <p className="small">
-              {measured.length ? measured.map((c) => CATEGORIES[c].label).join(', ') : <span className="muted">noch keine</span>}
+              {measured.length ? measured.map((c) => CATEGORIES[c].label).join(', ') : <span className="muted">none yet</span>}
             </p>
-            <Link to="/profile?tab=masse" className="small">
-              maße bearbeiten →
+            <Link to="/profile?tab=measurements" className="small">
+              edit measurements →
             </Link>
           </div>
         </div>

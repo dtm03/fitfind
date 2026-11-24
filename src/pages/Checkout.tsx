@@ -7,15 +7,15 @@ import { useProducts } from '../store/products';
 import { useStore } from '../store/store';
 import type { Address, Order, PaymentMethod, ShippingMethod } from '../types';
 
-const STEPS = ['adresse', 'versand', 'zahlung', 'prüfen'] as const;
+const STEPS = ['address', 'shipping', 'payment', 'review'] as const;
 
 const PAYMENT: Record<PaymentMethod, string> = {
-  card: 'kreditkarte',
-  paypal: 'paypal',
-  invoice: 'rechnung',
+  card: 'credit card',
+  paypal: 'PayPal',
+  invoice: 'invoice',
 };
 
-const EMPTY_ADDRESS: Address = { name: '', email: '', street: '', zip: '', city: '', country: 'deutschland' };
+const EMPTY_ADDRESS: Address = { name: '', email: '', street: '', zip: '', city: '', country: 'Germany' };
 
 interface Card {
   number: string;
@@ -24,9 +24,9 @@ interface Card {
 }
 
 function validateCard(card: Card): string | null {
-  if (card.number.replace(/\s/g, '').length < 16) return 'kartennummer unvollständig';
-  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(card.expiry)) return 'ablaufdatum als MM/JJ';
-  if (!/^\d{3,4}$/.test(card.cvc)) return 'cvc ungültig';
+  if (card.number.replace(/\s/g, '').length < 16) return 'incomplete card number';
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(card.expiry)) return 'expiry as MM/YY';
+  if (!/^\d{3,4}$/.test(card.cvc)) return 'invalid CVC';
   return null;
 }
 
@@ -34,7 +34,10 @@ export function Checkout() {
   const { state, dispatch } = useStore();
   const { byId } = useProducts();
   const [step, setStep] = useState(0);
-  const [address, setAddress] = useState<Address>({ ...EMPTY_ADDRESS, name: state.profile.name === 'gast' ? '' : state.profile.name });
+  const [address, setAddress] = useState<Address>({
+    ...EMPTY_ADDRESS,
+    name: state.profile.name === 'guest' ? '' : state.profile.name,
+  });
   const [shipping, setShipping] = useState<ShippingMethod>('standard');
   const [payment, setPayment] = useState<PaymentMethod>('card');
   const [card, setCard] = useState<Card>({ number: '', expiry: '', cvc: '' });
@@ -51,19 +54,19 @@ export function Checkout() {
       <div className="page narrow">
         <div className="panel confirm">
           <div className="prompt-line">
-            <span className="prompt">&gt;</span> bestellung {placed.order.id} bestätigt<span className="cursor">_</span>
+            <span className="prompt">&gt;</span> order {placed.order.id} confirmed<span className="cursor">_</span>
           </div>
-          <h1>danke{address.name ? `, ${address.name.split(' ')[0]}` : ''}.</h1>
+          <h1>thanks{address.name ? `, ${address.name.split(' ')[0]}` : ''}.</h1>
           <p>
-            wir haben {placed.order.lines.reduce((n, l) => n + l.qty, 0)} artikel für {formatPrice(placed.order.total)}{' '}
-            erhalten. lieferung: {SHIPPING[placed.order.shipping].eta}.
+            Received {placed.order.lines.reduce((n, l) => n + l.qty, 0)} items for {formatPrice(placed.order.total)}.
+            Delivery: {SHIPPING[placed.order.shipping].eta}.
           </p>
           {placed.fulfilled > 0 && (
-            <p className="muted">{placed.fulfilled} punkt(e) deiner einkaufsliste wurden als erledigt markiert.</p>
+            <p className="muted">{placed.fulfilled} shopping list item(s) marked done.</p>
           )}
-          <p className="muted small">demo – es wurde nichts bezahlt oder versendet.</p>
+          <p className="muted small">Demo — nothing was paid or shipped.</p>
           <Link to="/" className="btn btn-primary">
-            weiter shoppen
+            continue shopping
           </Link>
         </div>
       </div>
@@ -73,9 +76,9 @@ export function Checkout() {
   if (lines.length === 0) {
     return (
       <div className="page empty">
-        <p>dein warenkorb ist leer.</p>
+        <p>Your cart is empty.</p>
         <Link to="/" className="btn">
-          zum shop
+          back to shop
         </Link>
       </div>
     );
@@ -125,7 +128,7 @@ export function Checkout() {
 
   return (
     <div className="page">
-      <h1>kasse</h1>
+      <h1>checkout</h1>
       <ol className="steps">
         {STEPS.map((s, i) => (
           <li key={s} className={cls(i === step && 'on', i < step && 'done')}>
@@ -140,15 +143,15 @@ export function Checkout() {
         <div>
           {step === 0 && (
             <form className="form" onSubmit={next}>
-              {field('name', 'vor- und nachname', { autoComplete: 'name' })}
+              {field('name', 'full name', { autoComplete: 'name' })}
               {field('email', 'e-mail', { type: 'email', autoComplete: 'email' })}
-              {field('street', 'straße und hausnummer', { autoComplete: 'street-address' })}
+              {field('street', 'street and number', { autoComplete: 'street-address' })}
               <div className="form-row">
-                {field('zip', 'plz', { autoComplete: 'postal-code', pattern: '\\d{4,5}', title: '4–5 ziffern' })}
-                {field('city', 'stadt', { autoComplete: 'address-level2' })}
+                {field('zip', 'postal code', { autoComplete: 'postal-code', pattern: '\\d{4,5}', title: '4–5 digits' })}
+                {field('city', 'city', { autoComplete: 'address-level2' })}
               </div>
-              {field('country', 'land', { autoComplete: 'country-name' })}
-              <button className="btn btn-primary">weiter zum versand</button>
+              {field('country', 'country', { autoComplete: 'country-name' })}
+              <button className="btn btn-primary">continue to shipping</button>
             </form>
           )}
 
@@ -160,10 +163,10 @@ export function Checkout() {
                   <span className="grow">
                     {SHIPPING[m].label} <span className="muted">· {SHIPPING[m].eta}</span>
                   </span>
-                  <span>{shippingCost(subtotal, m) === 0 ? 'kostenlos' : formatPrice(shippingCost(subtotal, m))}</span>
+                  <span>{shippingCost(subtotal, m) === 0 ? 'free' : formatPrice(shippingCost(subtotal, m))}</span>
                 </label>
               ))}
-              <button className="btn btn-primary">weiter zur zahlung</button>
+              <button className="btn btn-primary">continue to payment</button>
             </form>
           )}
 
@@ -178,7 +181,7 @@ export function Checkout() {
               {payment === 'card' && (
                 <div className="card-fields">
                   <label className="field">
-                    <span>kartennummer</span>
+                    <span>card number</span>
                     <input
                       value={card.number}
                       inputMode="numeric"
@@ -192,7 +195,7 @@ export function Checkout() {
                   </label>
                   <div className="form-row">
                     <label className="field">
-                      <span>gültig bis</span>
+                      <span>expiry</span>
                       <input
                         value={card.expiry}
                         placeholder="MM/JJ"
@@ -216,10 +219,10 @@ export function Checkout() {
                   </div>
                 </div>
               )}
-              {payment === 'paypal' && <p className="muted small">du wirst nach dem prüfen zu paypal weitergeleitet (demo).</p>}
-              {payment === 'invoice' && <p className="muted small">zahlbar innerhalb von 14 tagen nach erhalt.</p>}
+              {payment === 'paypal' && <p className="muted small">You would be redirected to PayPal after review (demo).</p>}
+              {payment === 'invoice' && <p className="muted small">Payable within 14 days of receipt (demo).</p>}
               {error && <p className="error">! {error}</p>}
-              <button className="btn btn-primary">weiter zum prüfen</button>
+              <button className="btn btn-primary">continue to review</button>
             </form>
           )}
 
@@ -227,7 +230,7 @@ export function Checkout() {
             <div className="form">
               <div className="review">
                 <div>
-                  <div className="label">lieferadresse</div>
+                  <div className="label">delivery address</div>
                   <p>
                     {address.name}
                     <br />
@@ -238,38 +241,38 @@ export function Checkout() {
                     {address.country}
                   </p>
                   <button className="link-btn" onClick={() => setStep(0)}>
-                    ändern
+                    change
                   </button>
                 </div>
                 <div>
-                  <div className="label">versand</div>
+                  <div className="label">shipping</div>
                   <p>
                     {SHIPPING[shipping].label} · {SHIPPING[shipping].eta}
                   </p>
                   <button className="link-btn" onClick={() => setStep(1)}>
-                    ändern
+                    change
                   </button>
                 </div>
                 <div>
-                  <div className="label">zahlung</div>
+                  <div className="label">payment</div>
                   <p>
                     {PAYMENT[payment]}
                     {payment === 'card' && ` · •••• ${card.number.slice(-4)}`}
                   </p>
                   <button className="link-btn" onClick={() => setStep(2)}>
-                    ändern
+                    change
                   </button>
                 </div>
               </div>
               <button className="btn btn-primary" onClick={placeOrder}>
-                zahlungspflichtig bestellen · {formatPrice(total)}
+                place order · {formatPrice(total)}
               </button>
             </div>
           )}
         </div>
 
         <aside className="panel">
-          <h3>deine bestellung</h3>
+          <h3>your order</h3>
           <ul className="plain summary-lines">
             {lines.map(({ product, size, qty }) => (
               <li key={`${product.id}-${size}`} className="row-between">
@@ -281,11 +284,11 @@ export function Checkout() {
             ))}
           </ul>
           <dl className="totals">
-            <dt>zwischensumme</dt>
+            <dt>subtotal</dt>
             <dd>{formatPrice(subtotal)}</dd>
-            <dt>versand</dt>
-            <dd>{shippingPrice === 0 ? 'kostenlos' : formatPrice(shippingPrice)}</dd>
-            <dt className="total">gesamt</dt>
+            <dt>shipping</dt>
+            <dd>{shippingPrice === 0 ? 'free' : formatPrice(shippingPrice)}</dd>
+            <dt className="total">total</dt>
             <dd className="total">{formatPrice(total)}</dd>
           </dl>
         </aside>

@@ -11,8 +11,17 @@ const SHAPES: Record<Category, string> = {
 };
 
 export function ProductImage({ product, large = false }: { product: Product; large?: boolean }) {
+  const shell = large ? 'product-img large' : 'product-img';
+  if (product.imageUrl) {
+    return (
+      <div className={shell}>
+        <img src={product.imageUrl} alt="" loading="lazy" className="product-photo" />
+        <span className="product-img-tag">{product.color}</span>
+      </div>
+    );
+  }
   return (
-    <div className={large ? 'product-img large' : 'product-img'}>
+    <div className={shell}>
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <path d={SHAPES[product.category]} fill={product.colorHex} stroke="currentColor" strokeWidth="0.8" />
       </svg>

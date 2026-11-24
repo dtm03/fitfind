@@ -28,7 +28,7 @@ function AppRoutes() {
   if (loading) {
     return (
       <div className="page">
-        <span className="prompt">&gt;</span> lade katalog<span className="cursor">_</span>
+        <span className="prompt">&gt;</span> loading catalogue<span className="cursor">_</span>
       </div>
     );
   }
@@ -45,9 +45,9 @@ function AppRoutes() {
         path="*"
         element={
           <div className="page empty">
-            <p>404 – seite nicht gefunden.</p>
+            <p>404 — page not found.</p>
             <Link to="/" className="btn">
-              zum shop
+              back to shop
             </Link>
           </div>
         }
@@ -65,7 +65,7 @@ export function App() {
         <AppRoutes />
       </main>
       <footer className="footer muted small">
-        fitfind · prototyp mit beispieldaten · <span className="cursor">_</span>
+        fitfind · prototype with sample data · <span className="cursor">_</span>
       </footer>
     </>
   );

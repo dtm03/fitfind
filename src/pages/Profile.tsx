@@ -11,18 +11,18 @@ import { useStore } from '../store/store';
 import type { Category, CategoryGroup, Product } from '../types';
 
 const TABS = {
-  masse: 'maße',
-  liste: 'einkaufsliste',
-  marken: 'marken',
-  vorschlaege: 'vorschläge',
-  konto: 'konto',
+  measurements: 'measurements',
+  list: 'shopping list',
+  brands: 'brands',
+  suggestions: 'suggestions',
+  account: 'account',
 } as const;
 type Tab = keyof typeof TABS;
 
 export function Profile() {
   const [params, setParams] = useSearchParams();
   const raw = params.get('tab');
-  const tab: Tab = raw && raw in TABS ? (raw as Tab) : 'masse';
+  const tab: Tab = raw && raw in TABS ? (raw as Tab) : 'measurements';
   const { state } = useStore();
 
   return (
@@ -31,7 +31,7 @@ export function Profile() {
         <span className="avatar avatar-lg">{state.profile.name.charAt(0) || '?'}</span>
         <div>
           <h1>{state.profile.name}</h1>
-          <p className="muted small">deine daten bleiben lokal in diesem browser gespeichert.</p>
+          <p className="muted small">Your data stays in this browser only (localStorage).</p>
         </div>
       </div>
       <nav className="tabs">
@@ -41,11 +41,11 @@ export function Profile() {
           </button>
         ))}
       </nav>
-      {tab === 'masse' && <MeasurementsTab />}
-      {tab === 'liste' && <NeedsTab />}
-      {tab === 'marken' && <BrandsTab />}
-      {tab === 'vorschlaege' && <SuggestionsTab />}
-      {tab === 'konto' && <AccountTab />}
+      {tab === 'measurements' && <MeasurementsTab />}
+      {tab === 'list' && <NeedsTab />}
+      {tab === 'brands' && <BrandsTab />}
+      {tab === 'suggestions' && <SuggestionsTab />}
+      {tab === 'account' && <AccountTab />}
     </div>
   );
 }
@@ -57,15 +57,15 @@ function MeasurementsTab() {
   return (
     <section className="stack">
       <p className="muted">
-        tipp: leg ein kleidungsstück, das dir richtig gut passt, flach hin und miss es aus. das sind deine zielmaße –
-        jedes produkt wird dagegen verglichen.
+        Tip: lay a garment that fits you well flat and measure it. Those are your target dimensions — each product is
+        scored against them.
       </p>
 
       <div className="panel tolerance">
         <label className="field">
           <span>
-            toleranz: ±{profile.tolerance.toLocaleString('de-DE')} cm{' '}
-            <span className="muted">(längen ±{(profile.tolerance * 1.5).toLocaleString('de-DE')} cm)</span>
+            tolerance: ±{profile.tolerance.toLocaleString('en-GB')} cm{' '}
+            <span className="muted">(lengths ±{(profile.tolerance * 1.5).toLocaleString('en-GB')} cm)</span>
           </span>
           <input
             type="range"
@@ -78,7 +78,7 @@ function MeasurementsTab() {
         </label>
         {(['top', 'bottom'] as CategoryGroup[]).map((group) => (
           <label key={group} className="field field-inline">
-            <span>übliche größe {group === 'top' ? 'oberteile' : 'unterteile'}</span>
+            <span>usual size ({group === 'top' ? 'tops' : 'bottoms'})</span>
             <select
               value={profile.preferredSizes[group]}
               onChange={(e) => dispatch({ type: 'profile/preferredSize', group, size: e.target.value })}
@@ -101,7 +101,7 @@ function MeasurementsTab() {
                 <h3>{CATEGORIES[category].label}</h3>
                 {filled > 0 && (
                   <button className="link-btn" onClick={() => dispatch({ type: 'profile/clearCategory', category })}>
-                    leeren
+                    clear
                   </button>
                 )}
               </div>
@@ -150,22 +150,22 @@ function NeedsTab() {
   return (
     <section className="stack">
       <p className="muted">
-        was brauchst du? fitfind zeigt dir, welche punkte schon im warenkorb oder auf der merkliste sind.
+        What do you need? fitfind shows which items are already in the cart or on the wishlist.
       </p>
       <form className="need-form" onSubmit={add}>
-        <select value={category} onChange={(e) => setCategory(e.target.value as Category)} aria-label="kategorie">
+        <select value={category} onChange={(e) => setCategory(e.target.value as Category)} aria-label="category">
           {CATEGORY_ORDER.map((c) => (
             <option key={c} value={c}>
               {CATEGORIES[c].label}
             </option>
           ))}
         </select>
-        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="z. b. schwarzer hoodie, schwer" aria-label="notiz" />
+        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. black hoodie, heavy" aria-label="note" />
         <NumberInput value={maxPrice} onChange={setMaxPrice} placeholder="max €" min={0} aria-label="budget" />
-        <button className="btn btn-primary">hinzufügen</button>
+        <button className="btn btn-primary">add</button>
       </form>
 
-      {sorted.length === 0 && <p className="muted">deine liste ist leer.</p>}
+      {sorted.length === 0 && <p className="muted">Your list is empty.</p>}
       <ul className="plain needs-list">
         {sorted.map((need) => {
           const match = matchNeed(need, state.cart, state.wishlist, byId);
@@ -175,13 +175,13 @@ function NeedsTab() {
                 type="checkbox"
                 checked={need.done}
                 onChange={() => dispatch({ type: 'needs/toggleDone', id: need.id })}
-                aria-label="erledigt"
+                aria-label="done"
               />
               <div className="grow">
                 <div>{need.note || CATEGORIES[need.category].label}</div>
                 <div className="muted small">
                   {CATEGORIES[need.category].label}
-                  {need.maxPrice != null && ` · bis ${formatPrice(need.maxPrice)}`}
+                  {need.maxPrice != null && ` · up to ${formatPrice(need.maxPrice)}`}
                 </div>
               </div>
               <span className={cls('status', `status-${match.status}`)}>
@@ -194,10 +194,10 @@ function NeedsTab() {
               </span>
               {match.status === 'open' && (
                 <Link to={`/?cat=${need.category}`} className="btn btn-sm">
-                  suchen
+                  search
                 </Link>
               )}
-              <button className="link-btn" onClick={() => dispatch({ type: 'needs/remove', id: need.id })} aria-label="löschen">
+              <button className="link-btn" onClick={() => dispatch({ type: 'needs/remove', id: need.id })} aria-label="delete">
                 ×
               </button>
             </li>
@@ -258,14 +258,14 @@ function BrandsTab() {
   if (brands.length === 0) {
     return (
       <p className="muted">
-        hinterlege zuerst <Link to="/profile?tab=masse">deine maße</Link>, dann zeigen wir dir, welche marken dir liegen.
+        Save <Link to="/profile?tab=measurements">your measurements</Link> first to see which brands fit you.
       </p>
     );
   }
 
   return (
     <section className="stack">
-      <p className="muted">durchschnittlicher fit-score pro marke, basierend auf deinen hinterlegten kategorien.</p>
+      <p className="muted">Average fit score per brand from your saved categories.</p>
       <ul className="plain brand-list">
         {brands.map((b) => (
           <li key={b.brand}>
@@ -273,7 +273,7 @@ function BrandsTab() {
             <span className={`bar fit-text-${fitLevel(b.avg)}`}>{bar(b.avg)}</span>
             <span className="brand-score">{b.avg}</span>
             <span className="muted small">
-              {b.count} teile · deine größe: {b.sizes.join(' · ')}
+              {b.count} items · your size: {b.sizes.join(' · ')}
             </span>
           </li>
         ))}
@@ -289,14 +289,14 @@ function SuggestionsTab() {
   if (top.length === 0) {
     return (
       <p className="muted">
-        hinterlege zuerst <Link to="/profile?tab=masse">deine maße</Link>, um vorschläge zu bekommen.
+        Save <Link to="/profile?tab=measurements">your measurements</Link> first to get suggestions.
       </p>
     );
   }
 
   return (
     <section className="stack">
-      <p className="muted">die teile, die deinen zielmaßen am nächsten kommen.</p>
+      <p className="muted">Items closest to your target measurements.</p>
       <div className="grid">
         {top.map(({ product, fit }) => (
           <ProductCard key={product.id} product={product} fit={fit} />
@@ -312,20 +312,20 @@ function AccountTab() {
   return (
     <section className="stack narrow-left">
       <label className="field">
-        <span>anzeigename</span>
+        <span>display name</span>
         <input value={state.profile.name} onChange={(e) => dispatch({ type: 'profile/name', name: e.target.value })} />
       </label>
 
       <div>
-        <h3>bestellungen</h3>
-        {state.orders.length === 0 && <p className="muted small">noch keine bestellungen.</p>}
+        <h3>orders</h3>
+        {state.orders.length === 0 && <p className="muted small">no orders yet.</p>}
         <ul className="plain orders">
           {state.orders.map((o) => (
             <li key={o.id} className="row-between">
               <span>
                 {o.id} <span className="muted">· {new Date(o.createdAt).toLocaleDateString('de-DE')}</span>
               </span>
-              <span className="muted small">{o.lines.reduce((n, l) => n + l.qty, 0)} artikel</span>
+              <span className="muted small">{o.lines.reduce((n, l) => n + l.qty, 0)} items</span>
               <span>{formatPrice(o.total)}</span>
             </li>
           ))}
@@ -335,9 +335,11 @@ function AccountTab() {
       <div>
         <button
           className="btn btn-danger"
-          onClick={() => confirm('alle lokalen daten (maße, liste, warenkorb, merkliste) zurücksetzen?') && dispatch({ type: 'reset' })}
+          onClick={() =>
+            confirm('Reset all local data (measurements, list, cart, wishlist)?') && dispatch({ type: 'reset' })
+          }
         >
-          daten zurücksetzen
+          reset local data
         </button>
       </div>
     </section>

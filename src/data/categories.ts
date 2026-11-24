@@ -5,11 +5,11 @@ const BOTTOM_KEYS: MeasurementKey[] = ['waist', 'hip', 'inseam', 'rise', 'thigh'
 
 export const CATEGORIES: Record<Category, { label: string; group: CategoryGroup; keys: MeasurementKey[] }> = {
   tshirt: { label: 't-shirts', group: 'top', keys: TOP_KEYS },
-  shirt: { label: 'hemden', group: 'top', keys: TOP_KEYS },
+  shirt: { label: 'shirts', group: 'top', keys: TOP_KEYS },
   hoodie: { label: 'hoodies', group: 'top', keys: TOP_KEYS },
-  jacket: { label: 'jacken', group: 'top', keys: TOP_KEYS },
+  jacket: { label: 'jackets', group: 'top', keys: TOP_KEYS },
   jeans: { label: 'jeans', group: 'bottom', keys: BOTTOM_KEYS },
-  pants: { label: 'hosen', group: 'bottom', keys: BOTTOM_KEYS },
+  pants: { label: 'pants', group: 'bottom', keys: BOTTOM_KEYS },
   shorts: { label: 'shorts', group: 'bottom', keys: ['waist', 'inseam', 'thigh', 'legOpening'] },
 };
 
@@ -20,16 +20,16 @@ export function isCategory(value: string | null): value is Category {
 }
 
 export const MEASUREMENTS: Record<MeasurementKey, { label: string; short: string; hint: string }> = {
-  chest: { label: 'brustbreite', short: 'brust', hint: 'achsel zu achsel, flach gemessen' },
-  shoulder: { label: 'schulterbreite', short: 'schulter', hint: 'schulternaht zu schulternaht' },
-  length: { label: 'länge', short: 'länge', hint: 'höchster schulterpunkt bis saum' },
-  sleeve: { label: 'ärmellänge', short: 'ärmel', hint: 'schulternaht bis ärmelende' },
-  waist: { label: 'bundweite', short: 'bund', hint: 'bund flach, kante zu kante' },
-  hip: { label: 'hüftbreite', short: 'hüfte', hint: 'flach, breiteste stelle am gesäß' },
-  inseam: { label: 'innenbeinlänge', short: 'innenbein', hint: 'schritt bis saum' },
-  rise: { label: 'leibhöhe', short: 'leibhöhe', hint: 'schritt bis oberkante bund, vorne' },
-  thigh: { label: 'oberschenkelbreite', short: 'oberschenkel', hint: 'flach, 2,5 cm unter dem schritt' },
-  legOpening: { label: 'saumweite', short: 'saum', hint: 'beinöffnung flach' },
+  chest: { label: 'chest width', short: 'chest', hint: 'pit to pit, garment laid flat' },
+  shoulder: { label: 'shoulder width', short: 'shoulder', hint: 'seam to seam across back' },
+  length: { label: 'length', short: 'length', hint: 'highest shoulder point to hem' },
+  sleeve: { label: 'sleeve length', short: 'sleeve', hint: 'shoulder seam to cuff' },
+  waist: { label: 'waist width', short: 'waist', hint: 'flat waist edge to edge' },
+  hip: { label: 'hip width', short: 'hip', hint: 'flat at widest point' },
+  inseam: { label: 'inseam', short: 'inseam', hint: 'crotch to hem' },
+  rise: { label: 'rise', short: 'rise', hint: 'crotch to top of waistband, front' },
+  thigh: { label: 'thigh width', short: 'thigh', hint: 'flat, ~2.5 cm below crotch' },
+  legOpening: { label: 'leg opening', short: 'hem', hint: 'flat leg opening' },
 };
 
 export const SIZES: Record<CategoryGroup, string[]> = {

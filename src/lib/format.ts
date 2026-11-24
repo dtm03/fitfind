@@ -1,4 +1,4 @@
-const priceFormat = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+const priceFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'EUR' });
 
 export function formatPrice(value: number): string {
   return priceFormat.format(value);
@@ -6,12 +6,12 @@ export function formatPrice(value: number): string {
 
 export function formatCm(value: number | undefined): string {
   if (value == null) return '—';
-  return value.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  return value.toLocaleString('en-GB', { maximumFractionDigits: 1 });
 }
 
 export function formatDiff(value: number): string {
   if (value === 0) return '±0';
-  const abs = Math.abs(value).toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  const abs = Math.abs(value).toLocaleString('en-GB', { maximumFractionDigits: 1 });
   return value > 0 ? `+${abs}` : `−${abs}`;
 }
 

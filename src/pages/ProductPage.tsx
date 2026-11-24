@@ -17,13 +17,13 @@ export function ProductPage() {
   const [picked, setPicked] = useState<string>();
   const [added, setAdded] = useState(false);
 
-  if (loading) return <div className="page muted">lade…</div>;
+  if (loading) return <div className="page muted">loading…</div>;
   if (!product) {
     return (
       <div className="page empty">
-        <p>produkt nicht gefunden.</p>
+        <p>product not found.</p>
         <Link to="/" className="btn">
-          zum shop
+          back to shop
         </Link>
       </div>
     );
@@ -51,7 +51,7 @@ export function ProductPage() {
   return (
     <div className="page">
       <Link to="/" className="back">
-        ← zurück zum shop
+        ← back to shop
       </Link>
       <div className="pdp">
         <ProductImage product={product} large />
@@ -62,19 +62,33 @@ export function ProductPage() {
           <div className="pdp-price">{formatPrice(product.price)}</div>
           <p>{product.description}</p>
           <dl className="specs">
-            <dt>kategorie</dt>
+            <dt>category</dt>
             <dd>{CATEGORIES[product.category].label}</dd>
-            <dt>schnitt</dt>
+            <dt>fit</dt>
             <dd>{product.fit}</dd>
-            <dt>farbe</dt>
+            <dt>color</dt>
             <dd>{product.color}</dd>
             <dt>material</dt>
             <dd>{product.material}</dd>
-            <dt>quelle</dt>
+            <dt>made in</dt>
+            <dd>{product.originCountry}</dd>
+            <dt>ethics</dt>
+            <dd>
+              {product.ethics.fairTrade || product.ethics.organic || product.ethics.recycled
+                ? [
+                    product.ethics.fairTrade && 'fair trade',
+                    product.ethics.organic && 'organic',
+                    product.ethics.recycled && 'recycled',
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')
+                : '—'}
+            </dd>
+            <dt>source</dt>
             <dd>{product.source.shop}</dd>
           </dl>
 
-          <div className="label">größe</div>
+          <div className="label">size</div>
           <div className="size-picker">
             {product.variants.map((v) => {
               const s = target ? scoreVariant(v, target, state.profile.tolerance) : null;
@@ -84,7 +98,7 @@ export function ProductPage() {
                   disabled={!v.inStock}
                   className={cls('size-btn', v.size === size && 'on', best?.size === v.size && 'best')}
                   onClick={() => setPicked(v.size)}
-                  title={v.inStock ? undefined : 'ausverkauft'}
+                  title={v.inStock ? undefined : 'out of stock'}
                 >
                   <span>{v.size}</span>
                   {s && <span className={`size-score fit-text-${fitLevel(s.score)}`}>{s.score}</span>}
@@ -94,72 +108,74 @@ export function ProductPage() {
           </div>
           {best && (
             <p className="small muted">
-              empfehlung: <FitBadge fit={best} showLabel />
+              recommended: <FitBadge fit={best} showLabel />
             </p>
           )}
           {!target && (
             <p className="small muted">
-              <Link to="/profile?tab=masse">maße für {CATEGORIES[product.category].label} hinterlegen</Link>, um eine
-              größenempfehlung zu bekommen.
+              <Link to="/profile?tab=measurements">save measurements for {CATEGORIES[product.category].label}</Link> for
+              size recommendations.
             </p>
           )}
 
           <div className="pdp-actions">
             <button className="btn btn-primary" disabled={!variant?.inStock} onClick={addToCart}>
-              {added ? '✓ im warenkorb' : `in den warenkorb${size ? ` · ${size}` : ''}`}
+              {added ? '✓ in cart' : `add to cart${size ? ` · ${size}` : ''}`}
             </button>
             <button className="btn" onClick={() => dispatch({ type: 'wishlist/toggle', productId: product.id })}>
-              {wished ? '♥ gemerkt' : '♡ merken'}
+              {wished ? '♥ saved' : '♡ save'}
             </button>
           </div>
+
+          <section className="pdp-chart" aria-labelledby="pdp-size-chart">
+            <h2 id="pdp-size-chart" className="pdp-chart-title">
+              size chart
+            </h2>
+            <p className="muted small pdp-chart-hint">cm, flat. click a column to pick a size.</p>
+            <div className="table-wrap pdp-chart-table">
+              <table className="mtable compact">
+                <thead>
+                  <tr>
+                    <th />
+                    {product.variants.map((v) => (
+                      <th
+                        key={v.size}
+                        className={cls(v.size === size && 'sel', !v.inStock && 'oos')}
+                        onClick={() => v.inStock && setPicked(v.size)}
+                      >
+                        {v.size}
+                      </th>
+                    ))}
+                    {target && <th className="target">your target</th>}
+                    {selectedFit && <th>delta</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {keys.map((key: MeasurementKey) => {
+                    const diff = selectedFit?.diffs[key];
+                    return (
+                      <tr key={key}>
+                        <td title={MEASUREMENTS[key].hint}>{MEASUREMENTS[key].label}</td>
+                        {product.variants.map((v) => (
+                          <td key={v.size} className={cls(v.size === size && 'sel', !v.inStock && 'oos')}>
+                            {formatCm(v.measurements[key])}
+                          </td>
+                        ))}
+                        {target && <td className="target">{formatCm(target[key])}</td>}
+                        {selectedFit && (
+                          <td className={cls(diff != null && Math.abs(diff) > state.profile.tolerance && 'warn')}>
+                            {diff != null ? formatDiff(diff) : '—'}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </div>
-
-      <section className="section">
-        <h2>maßtabelle</h2>
-        <p className="muted small">alle angaben in cm, flach gemessen. spalte anklicken, um die größe zu wählen.</p>
-        <div className="table-wrap">
-          <table className="mtable">
-            <thead>
-              <tr>
-                <th />
-                {product.variants.map((v) => (
-                  <th
-                    key={v.size}
-                    className={cls(v.size === size && 'sel', !v.inStock && 'oos')}
-                    onClick={() => v.inStock && setPicked(v.size)}
-                  >
-                    {v.size}
-                  </th>
-                ))}
-                {target && <th className="target">dein ziel</th>}
-                {selectedFit && <th>abweichung</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {keys.map((key: MeasurementKey) => {
-                const diff = selectedFit?.diffs[key];
-                return (
-                  <tr key={key}>
-                    <td title={MEASUREMENTS[key].hint}>{MEASUREMENTS[key].label}</td>
-                    {product.variants.map((v) => (
-                      <td key={v.size} className={cls(v.size === size && 'sel', !v.inStock && 'oos')}>
-                        {formatCm(v.measurements[key])}
-                      </td>
-                    ))}
-                    {target && <td className="target">{formatCm(target[key])}</td>}
-                    {selectedFit && (
-                      <td className={cls(diff != null && Math.abs(diff) > state.profile.tolerance && 'warn')}>
-                        {diff != null ? formatDiff(diff) : '—'}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   );
 }

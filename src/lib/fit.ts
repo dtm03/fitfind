@@ -61,8 +61,8 @@ export function fitLevel(score: number): FitLevel {
 }
 
 export const FIT_LABEL: Record<FitLevel, string> = {
-  great: 'passgenau',
-  good: 'gut',
-  meh: 'mäßig',
-  bad: 'passt nicht',
+  great: 'spot on',
+  good: 'good',
+  meh: 'okay',
+  bad: 'poor fit',
 };

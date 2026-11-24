@@ -5,3 +5,12 @@ dist
 !.env.example
 *.local
 .vite
+measurements.db
+inspect_output/
+
+# Python (optional scraper)
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.python-version

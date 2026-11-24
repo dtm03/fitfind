@@ -18,6 +18,14 @@ export type Measurements = Partial<Record<MeasurementKey, number>>;
 
 export type FitStyle = 'slim' | 'regular' | 'relaxed' | 'oversized';
 
+export type Fiber = 'cotton' | 'wool' | 'linen' | 'polyester' | 'elastane' | 'viscose' | 'nylon';
+
+export interface ProductEthics {
+  fairTrade: boolean;
+  organic: boolean;
+  recycled: boolean;
+}
+
 export interface SizeVariant {
   size: string;
   measurements: Measurements;
@@ -33,9 +41,13 @@ export interface Product {
   color: string;
   colorHex: string;
   material: string;
+  fibers: Fiber[];
+  originCountry: string;
+  ethics: ProductEthics;
   fit: FitStyle;
   description: string;
   variants: SizeVariant[];
+  imageUrl?: string;
   source: { shop: string; url: string };
 }
 

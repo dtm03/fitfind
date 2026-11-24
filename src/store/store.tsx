@@ -30,18 +30,19 @@ const STORAGE_KEY = 'fitfind:v1';
 
 export const initialState: State = {
   profile: {
-    name: 'gast',
+    name: 'guest',
     preferredSizes: { top: 'M', bottom: '32' },
     fit: {
       tshirt: { chest: 54, shoulder: 47, length: 72, sleeve: 21 },
+      shirt: { chest: 54, shoulder: 47, length: 72, sleeve: 21 },
       jeans: { waist: 41.5, inseam: 81, rise: 28, thigh: 32 },
     },
     tolerance: 2,
   },
   needs: [
-    { id: 'n1', category: 'tshirt', note: 'weißes t-shirt, eher boxy', done: false, createdAt: 0 },
-    { id: 'n2', category: 'jeans', note: 'dunkle jeans, gerades bein', maxPrice: 120, done: false, createdAt: 0 },
-    { id: 'n3', category: 'jacket', note: 'leichte übergangsjacke', done: false, createdAt: 0 },
+    { id: 'n1', category: 'tshirt', note: 'white tee, boxy fit', done: false, createdAt: 0 },
+    { id: 'n2', category: 'jeans', note: 'dark straight jeans', maxPrice: 120, done: false, createdAt: 0 },
+    { id: 'n3', category: 'jacket', note: 'light transitional jacket', done: false, createdAt: 0 },
   ],
   cart: [],
   wishlist: [],

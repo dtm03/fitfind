@@ -33,6 +33,16 @@ export function ProductCard({ product, fit, matchedSizes }: Props) {
               {CATEGORIES[product.category].label} · {product.fit}
             </span>
           </div>
+          <div className="card-meta-line muted small">
+            {product.material} · {product.originCountry}
+          </div>
+          {(product.ethics.fairTrade || product.ethics.organic || product.ethics.recycled) && (
+            <div className="ethics-tags">
+              {product.ethics.fairTrade && <span className="ethics-tag">fair trade</span>}
+              {product.ethics.organic && <span className="ethics-tag">organic</span>}
+              {product.ethics.recycled && <span className="ethics-tag">recycled</span>}
+            </div>
+          )}
           <div className="sizes">
             {product.variants.map((v) => (
               <span
@@ -53,8 +63,8 @@ export function ProductCard({ product, fit, matchedSizes }: Props) {
       <button
         className={cls('wish', wished && 'on')}
         onClick={() => dispatch({ type: 'wishlist/toggle', productId: product.id })}
-        aria-label={wished ? 'von merkliste entfernen' : 'auf merkliste'}
-        title={wished ? 'von merkliste entfernen' : 'auf merkliste'}
+        aria-label={wished ? 'remove from wishlist' : 'add to wishlist'}
+        title={wished ? 'remove from wishlist' : 'add to wishlist'}
       >
         {wished ? '♥' : '♡'}
       </button>

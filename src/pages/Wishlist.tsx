@@ -12,12 +12,12 @@ export function Wishlist() {
 
   return (
     <div className="page">
-      <h1>merkliste</h1>
+      <h1>wishlist</h1>
       {products.length === 0 ? (
         <div className="empty">
-          <p>noch nichts gemerkt. tipp auf ♡ bei einem produkt.</p>
+          <p>Nothing saved yet. Tap ♡ on a product.</p>
           <Link to="/" className="btn">
-            zum shop
+            back to shop
           </Link>
         </div>
       ) : (
@@ -38,7 +38,7 @@ export function Wishlist() {
                   disabled={!size}
                   onClick={() => size && dispatch({ type: 'cart/add', productId: product.id, size })}
                 >
-                  {size ? `${inCart ? '+1 ' : ''}in den warenkorb · ${size}` : 'ausverkauft'}
+                  {size ? `${inCart ? '+1 ' : ''}add to cart · ${size}` : 'out of stock'}
                 </button>
               </div>
             );

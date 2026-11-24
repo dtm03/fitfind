@@ -17,14 +17,14 @@ export function Cart() {
 
   return (
     <div className="page">
-      <h1>warenkorb</h1>
+      <h1>cart</h1>
       <div className="split">
         <div>
           {lines.length === 0 ? (
             <div className="empty">
-              <p>dein warenkorb ist leer.</p>
+              <p>Your cart is empty.</p>
               <Link to="/" className="btn">
-                weiter shoppen
+                continue shopping
               </Link>
             </div>
           ) : (
@@ -42,20 +42,20 @@ export function Cart() {
                       <div className="muted small">{product.brand.toLowerCase()}</div>
                       <Link to={`/product/${product.id}`}>{product.name}</Link>
                       <div className="small">
-                        größe {size} · {product.color} <FitBadge fit={fit} />
+                        size {size} · {product.color} <FitBadge fit={fit} />
                       </div>
                     </div>
                     <div className="qty">
                       <button
                         onClick={() => dispatch({ type: 'cart/setQty', productId: product.id, size, qty: qty - 1 })}
-                        aria-label="weniger"
+                        aria-label="decrease quantity"
                       >
                         −
                       </button>
                       <span>{qty}</span>
                       <button
                         onClick={() => dispatch({ type: 'cart/setQty', productId: product.id, size, qty: qty + 1 })}
-                        aria-label="mehr"
+                        aria-label="increase quantity"
                       >
                         +
                       </button>
@@ -64,7 +64,7 @@ export function Cart() {
                     <button
                       className="link-btn"
                       onClick={() => dispatch({ type: 'cart/remove', productId: product.id, size })}
-                      aria-label="entfernen"
+                      aria-label="remove"
                     >
                       ×
                     </button>
@@ -78,20 +78,22 @@ export function Cart() {
         <div className="stack">
           {lines.length > 0 && (
             <aside className="panel">
-              <h3>zusammenfassung</h3>
+              <h3>summary</h3>
               <dl className="totals">
-                <dt>zwischensumme</dt>
+                <dt>subtotal</dt>
                 <dd>{formatPrice(subtotal)}</dd>
-                <dt>versand</dt>
-                <dd>{shipping === 0 ? 'kostenlos' : formatPrice(shipping)}</dd>
-                <dt className="total">gesamt</dt>
+                <dt>shipping</dt>
+                <dd>{shipping === 0 ? 'free' : formatPrice(shipping)}</dd>
+                <dt className="total">total</dt>
                 <dd className="total">{formatPrice(subtotal + shipping)}</dd>
               </dl>
               {subtotal < FREE_SHIPPING_FROM && (
-                <p className="muted small">noch {formatPrice(FREE_SHIPPING_FROM - subtotal)} bis zum kostenlosen versand.</p>
+                <p className="muted small">
+                  {formatPrice(FREE_SHIPPING_FROM - subtotal)} more for free shipping.
+                </p>
               )}
               <Link to="/checkout" className="btn btn-primary btn-block">
-                zur kasse
+                checkout
               </Link>
             </aside>
           )}

@@ -3,10 +3,10 @@ import type { CartItem, Need, Product } from '../types';
 export type NeedStatus = 'done' | 'in-cart' | 'wishlisted' | 'open';
 
 export const NEED_STATUS_LABEL: Record<NeedStatus, string> = {
-  done: 'erledigt',
-  'in-cart': 'im warenkorb',
-  wishlisted: 'auf merkliste',
-  open: 'offen',
+  done: 'done',
+  'in-cart': 'in cart',
+  wishlisted: 'wishlisted',
+  open: 'open',
 };
 
 export interface NeedMatch {

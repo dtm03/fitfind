@@ -6,6 +6,7 @@ interface ProductsState {
   products: Product[];
   byId: Map<string, Product>;
   brands: string[];
+  origins: string[];
   loading: boolean;
   error?: string;
 }
@@ -33,6 +34,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       products,
       byId: new Map(products.map((p) => [p.id, p])),
       brands: [...new Set(products.map((p) => p.brand))].sort((a, b) => a.localeCompare(b)),
+      origins: [...new Set(products.map((p) => p.originCountry))].sort((a, b) => a.localeCompare(b)),
       loading,
       error,
     }),
