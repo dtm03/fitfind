@@ -1,6 +1,8 @@
 # fitfind
 
-Filter clothes by **garment measurements** (chest width, length, shoulder, etc.) — not just S / M / L. Dark monospace UI, fit profile, wishlist, demo checkout, shopping list vs cart.
+Filter clothes by **garment measurements** (chest width, length, shoulder, etc.) — not just S / M / L. Dark monospace UI, fit profile, wishlist, shopping list.
+
+**No checkout on this site.** “Buy at …” sends you to `/retailer/:id` — a demo page that stands in for the partner’s product URL (`product.source.url`). A live product would use affiliate outbound links only.
 
 This repo is a **front-end demo** with a fictional catalogue in `src/data/products.ts` (per-size cm measurements, placeholder product art).
 

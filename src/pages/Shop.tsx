@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { FilterBar } from "../components/FilterBar";
 import { ProductCard } from "../components/ProductCard";
 import { isCategory } from "../data/categories";
@@ -48,10 +48,7 @@ export function Shop() {
       />
 
       {!hasAnyMeasurements && (
-        <p className="notice">
-          No target measurements saved yet.{" "}
-          <Link to="/profile?tab=measurements">add measurements →</Link>
-        </p>
+        <p className="notice">No target measurements saved yet. Use measurements in the header.</p>
       )}
 
       <div className="results-head">

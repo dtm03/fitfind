@@ -1,14 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { CATEGORIES } from '../data/categories';
-import { matchNeed, NEED_STATUS_LABEL } from '../lib/needs';
-import { useProducts } from '../store/products';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { BrandsPanel } from './panels/BrandsPanel';
+import { MeasurementsPanel } from './panels/MeasurementsPanel';
+import { ShoppingListPanel } from './panels/ShoppingListPanel';
+import { WishlistPanel } from './panels/WishlistPanel';
+import { cls } from '../lib/format';
 import { useStore } from '../store/store';
 import type { Category } from '../types';
 
+type HeaderPanel = 'wishlist' | 'list' | 'brands' | 'measurements';
+
 export function Header() {
   const { state } = useStore();
-  const cartCount = state.cart.reduce((n, i) => n + i.qty, 0);
+  const [open, setOpen] = useState<HeaderPanel | null>(null);
+
+  const openNeeds = state.needs.filter((n) => !n.done).length;
+  const measuredCount = (Object.keys(state.profile.fit) as Category[]).filter(
+    (c) => Object.keys(state.profile.fit[c] ?? {}).length > 0,
+  ).length;
 
   return (
     <header className="header">
@@ -19,86 +28,99 @@ export function Header() {
         <NavLink to="/" end>
           shop
         </NavLink>
-        <NavLink to="/wishlist">wishlist{state.wishlist.length > 0 && <sup>{state.wishlist.length}</sup>}</NavLink>
-        <NavLink to="/cart">cart{cartCount > 0 && <sup>{cartCount}</sup>}</NavLink>
-        <ProfileMenu />
+        <HeaderDropdown
+          label="wishlist"
+          panel="wishlist"
+          active={open}
+          onToggle={setOpen}
+          badge={state.wishlist.length > 0 ? state.wishlist.length : undefined}
+          size="sm"
+        >
+          <WishlistPanel />
+        </HeaderDropdown>
+        <HeaderDropdown
+          label="list"
+          panel="list"
+          active={open}
+          onToggle={setOpen}
+          badge={openNeeds > 0 ? openNeeds : undefined}
+        >
+          <ShoppingListPanel />
+        </HeaderDropdown>
+        <HeaderDropdown label="brands" panel="brands" active={open} onToggle={setOpen}>
+          <BrandsPanel />
+        </HeaderDropdown>
+        <HeaderDropdown
+          label="measurements"
+          panel="measurements"
+          active={open}
+          onToggle={setOpen}
+          badge={measuredCount > 0 ? measuredCount : undefined}
+          size="lg"
+        >
+          <MeasurementsPanel />
+        </HeaderDropdown>
       </nav>
     </header>
   );
 }
 
-function ProfileMenu() {
-  const { state } = useStore();
-  const { byId } = useProducts();
-  const [open, setOpen] = useState(false);
+function HeaderDropdown({
+  label,
+  panel,
+  active,
+  onToggle,
+  badge,
+  size = 'md',
+  children,
+}: {
+  label: string;
+  panel: HeaderPanel;
+  active: HeaderPanel | null;
+  onToggle: (next: HeaderPanel | null) => void;
+  badge?: number;
+  size?: 'sm' | 'md' | 'lg';
+  children: ReactNode;
+}) {
+  const open = active === panel;
   const ref = useRef<HTMLDivElement>(null);
-  const location = useLocation();
-
-  useEffect(() => {
-    setOpen(false);
-  }, [location]);
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) onToggle(null);
     };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onToggle(null);
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('mousedown', onDown);
       document.removeEventListener('keydown', onKey);
     };
-  }, [open]);
-
-  const openNeeds = state.needs.filter((n) => !n.done);
-  const measured = (Object.keys(state.profile.fit) as Category[]).filter(
-    (c) => Object.keys(state.profile.fit[c] ?? {}).length > 0,
-  );
+  }, [open, onToggle]);
 
   return (
-    <div className="profile-menu" ref={ref}>
-      <button className="profile-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span className="avatar">{state.profile.name.charAt(0) || '?'}</span>
-        profile{openNeeds.length > 0 && <sup>{openNeeds.length}</sup>}
+    <div className="header-dropdown" ref={ref}>
+      <button
+        type="button"
+        className={cls('nav-panel-btn', open && 'on')}
+        aria-expanded={open}
+        onClick={() => onToggle(open ? null : panel)}
+      >
+        {label}
+        {badge != null && <sup>{badge}</sup>}
       </button>
       {open && (
-        <div className="popover">
-          <div className="popover-head">
-            <strong>{state.profile.name}</strong>
-            <Link to="/profile">edit →</Link>
-          </div>
-
-          <div className="popover-section">
-            <div className="label">shopping list</div>
-            {openNeeds.length === 0 && <p className="muted small">nothing open.</p>}
-            <ul className="plain">
-              {openNeeds.slice(0, 5).map((need) => {
-                const match = matchNeed(need, state.cart, state.wishlist, byId);
-                return (
-                  <li key={need.id} className="need-mini">
-                    <span className={`dot dot-${match.status}`} />
-                    <span className="grow">{need.note || CATEGORIES[need.category].label}</span>
-                    <span className="muted small">{NEED_STATUS_LABEL[match.status]}</span>
-                  </li>
-                );
-              })}
-            </ul>
-            <Link to="/profile?tab=list" className="small">
-              open list →
-            </Link>
-          </div>
-
-          <div className="popover-section">
-            <div className="label">saved measurements</div>
-            <p className="small">
-              {measured.length ? measured.map((c) => CATEGORIES[c].label).join(', ') : <span className="muted">none yet</span>}
-            </p>
-            <Link to="/profile?tab=measurements" className="small">
-              edit measurements →
-            </Link>
-          </div>
+        <div
+          className={cls(
+            'popover',
+            'header-popover',
+            size === 'sm' && 'header-popover-sm',
+            size === 'lg' && 'header-popover-lg',
+            panel === 'measurements' && 'header-popover-measurements',
+          )}
+        >
+          {children}
         </div>
       )}
     </div>

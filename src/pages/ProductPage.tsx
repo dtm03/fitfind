@@ -5,6 +5,7 @@ import { ProductImage } from '../components/ProductImage';
 import { CATEGORIES, MEASUREMENTS } from '../data/categories';
 import { bestFit, fitLevel, scoreVariant, targetFor } from '../lib/fit';
 import { cls, formatCm, formatDiff, formatPrice } from '../lib/format';
+import { RetailerBuyLink } from '../lib/productLink';
 import { useProducts } from '../store/products';
 import { useStore } from '../store/store';
 import type { MeasurementKey } from '../types';
@@ -15,7 +16,6 @@ export function ProductPage() {
   const { state, dispatch } = useStore();
   const product = id ? byId.get(id) : undefined;
   const [picked, setPicked] = useState<string>();
-  const [added, setAdded] = useState(false);
 
   if (loading) return <div className="page muted">loading…</div>;
   if (!product) {
@@ -40,13 +40,6 @@ export function ProductPage() {
   const selectedFit = variant && target ? scoreVariant(variant, target, state.profile.tolerance) : null;
   const keys = CATEGORIES[product.category].keys.filter((k) => product.variants[0]?.measurements[k] != null);
   const wished = state.wishlist.includes(product.id);
-
-  const addToCart = () => {
-    if (!variant?.inStock) return;
-    dispatch({ type: 'cart/add', productId: product.id, size: variant.size });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1600);
-  };
 
   return (
     <div className="page">
@@ -113,15 +106,16 @@ export function ProductPage() {
           )}
           {!target && (
             <p className="small muted">
-              <Link to="/profile?tab=measurements">save measurements for {CATEGORIES[product.category].label}</Link> for
-              size recommendations.
+              Open measurements in the header to save targets for {CATEGORIES[product.category].label}.
             </p>
           )}
 
           <div className="pdp-actions">
-            <button className="btn btn-primary" disabled={!variant?.inStock} onClick={addToCart}>
-              {added ? '✓ in cart' : `add to cart${size ? ` · ${size}` : ''}`}
-            </button>
+            <RetailerBuyLink
+              product={product}
+              size={variant?.inStock ? size : undefined}
+              disabled={!variant?.inStock}
+            />
             <button className="btn" onClick={() => dispatch({ type: 'wishlist/toggle', productId: product.id })}>
               {wished ? '♥ saved' : '♡ save'}
             </button>

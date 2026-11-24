@@ -96,7 +96,7 @@ export function Checkout() {
 
   const placeOrder = () => {
     const fulfilledNeedIds = state.needs
-      .filter((n) => matchNeed(n, state.cart, [], byId).status === 'in-cart')
+      .filter((n) => matchNeed(n, state.wishlist, byId).status === 'wishlisted')
       .map((n) => n.id);
     const order: Order = {
       id: `FF-${uid().toUpperCase()}`,

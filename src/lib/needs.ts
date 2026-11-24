@@ -1,11 +1,10 @@
-import type { CartItem, Need, Product } from '../types';
+import type { Need, Product } from '../types';
 
-export type NeedStatus = 'done' | 'in-cart' | 'wishlisted' | 'open';
+export type NeedStatus = 'done' | 'wishlisted' | 'open';
 
 export const NEED_STATUS_LABEL: Record<NeedStatus, string> = {
   done: 'done',
-  'in-cart': 'in cart',
-  wishlisted: 'wishlisted',
+  wishlisted: 'on wishlist',
   open: 'open',
 };
 
@@ -19,15 +18,8 @@ function matches(need: Need, product: Product | undefined): product is Product {
   return need.maxPrice == null || product.price <= need.maxPrice;
 }
 
-export function matchNeed(
-  need: Need,
-  cart: CartItem[],
-  wishlist: string[],
-  byId: Map<string, Product>,
-): NeedMatch {
+export function matchNeed(need: Need, wishlist: string[], byId: Map<string, Product>): NeedMatch {
   if (need.done) return { status: 'done' };
-  const inCart = cart.map((item) => byId.get(item.productId)).find((p) => matches(need, p));
-  if (inCart) return { status: 'in-cart', product: inCart };
   const wished = wishlist.map((id) => byId.get(id)).find((p) => matches(need, p));
   if (wished) return { status: 'wishlisted', product: wished };
   return { status: 'open' };

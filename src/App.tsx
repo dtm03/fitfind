@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
-import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
-import { Cart } from './pages/Cart';
-import { Checkout } from './pages/Checkout';
 import { ProductPage } from './pages/ProductPage';
-import { Profile } from './pages/Profile';
+import { RetailerPage } from './pages/RetailerPage';
 import { Shop } from './pages/Shop';
-import { Wishlist } from './pages/Wishlist';
 import { useProducts } from './store/products';
 
 function ProductRoute() {
@@ -37,10 +34,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Shop />} />
       <Route path="/product/:id" element={<ProductRoute />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/wishlist" element={<Wishlist />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/retailer/:id" element={<RetailerPage />} />
+      <Route path="/wishlist" element={<Navigate to="/" replace />} />
       <Route
         path="*"
         element={

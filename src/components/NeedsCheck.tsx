@@ -4,20 +4,20 @@ import { matchNeed, NEED_STATUS_LABEL } from '../lib/needs';
 import { useProducts } from '../store/products';
 import { useStore } from '../store/store';
 
-/** Shows which open items of the shopping list are already covered by the cart. */
+/** Shows which open shopping-list items already have a wishlist match. */
 export function NeedsCheck() {
   const { state } = useStore();
   const { byId } = useProducts();
   const open = state.needs.filter((n) => !n.done);
-  const matches = open.map((need) => ({ need, match: matchNeed(need, state.cart, state.wishlist, byId) }));
-  const covered = matches.filter((m) => m.match.status === 'in-cart').length;
+  const matches = open.map((need) => ({ need, match: matchNeed(need, state.wishlist, byId) }));
+  const covered = matches.filter((m) => m.match.status === 'wishlisted').length;
 
   return (
     <aside className="panel">
       <div className="row-between">
         <h3>shopping list</h3>
         <span className="muted small">
-          {covered}/{open.length} in cart
+          {covered}/{open.length} on wishlist
         </span>
       </div>
       {open.length > 0 && (
@@ -48,9 +48,7 @@ export function NeedsCheck() {
           </li>
         ))}
       </ul>
-      <Link to="/profile?tab=list" className="small">
-        edit list →
-      </Link>
+      <span className="muted small">edit via list in the header</span>
     </aside>
   );
 }
